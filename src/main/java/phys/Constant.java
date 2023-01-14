@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.Random;
 
 public interface Constant {
+    BigDecimal ZERO = BigDecimal.ZERO;
     static BigDecimal getRandomBigDecimal() {
         int d = new Random().nextInt(999999999);
         return new BigDecimal(d + "." + d);
@@ -56,5 +57,28 @@ public interface Constant {
 
         throw new Exception("Error: One or both variables are not distance values");
     }
+
+
+    static BigDecimal getConversionFactorTime(SiSystem orig, SiSystem to) throws Exception {
+        if (orig == to || (orig == null || to == null))
+            throw new Exception("Error: Same units, No need to convert");
+
+        if (orig == SiSystem.HOUR_TIME && to == SiSystem.MINUTE_TIME)
+            return new BigDecimal("60");
+
+        if (orig == SiSystem.HOUR_TIME && to == SiSystem.SECOND_TIME)
+            return new BigDecimal("3600");
+
+        if (orig == SiSystem.MINUTE_TIME && to == SiSystem.SECOND_TIME)
+            return new BigDecimal("60");
+
+
+
+
+
+        throw new Exception("Error: One or both variables are not time values");
+    }
+
+
 
 }

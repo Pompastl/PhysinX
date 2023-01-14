@@ -1,6 +1,9 @@
 package phys;
 
+import phys.math.FormulaManager;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PhysicalEntity extends Converter{
 
@@ -9,6 +12,8 @@ public class PhysicalEntity extends Converter{
     protected BigDecimal time_t;
     protected BigDecimal boost_a;
     protected BigDecimal distance_S;
+    protected static List<ValueEntity> knowValues = new ArrayList<ValueEntity>();
+    protected String formula = "";
 
     public void setValue(ValueEntity value, double num){
         setValue(value, String.valueOf(num));
@@ -31,6 +36,13 @@ public class PhysicalEntity extends Converter{
             case SPEED_V1 -> speed_V1 = num;
             case TIME_t -> time_t = num;
         }
+
+        if (num.equals(ZERO) && knowValues.contains(value)){
+            knowValues.remove(value);
+            return;
+        }
+
+        knowValues.add(value);
     }
 
     public BigDecimal getValue(ValueEntity value){
@@ -43,13 +55,32 @@ public class PhysicalEntity extends Converter{
         };
     }
 
-    public void convert(ValueEntity value, SiSystem orig, SiSystem to) {
-        try {
-            BigDecimal num = distance(getValue(value), orig, to);
-            setValue(value, num);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    public BigDecimal getValue(){
+        return null;
     }
 
+    public void convert(ValueEntity value, SiSystem orig, SiSystem to) throws Exception {
+
+        BigDecimal num = distance(getValue(value), orig, to);
+        setValue(value, num);
+
+    }
+
+    protected int getFormula(ValueEntity value){
+        FormulaManager formulaManager = new FormulaManager(knowValues);
+        int i = formulaManager.getFor(value);
+        formula = formulaManager.toString();
+
+        return i;
+    }
+
+    protected BigDecimal getSpeed() {
+        return speed_V0.equals(ZERO) ? speed_V1 : speed_V0;
+    }
+
+    @Override
+    public String toString() {
+        return formula;
+    }
 }
+
